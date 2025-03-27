@@ -1,0 +1,1 @@
+web: gunicorn tesla_vandalism.wsgi
