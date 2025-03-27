@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div id="map"></div>
+<div id="custom-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">×</span>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<style>
+  .full-width {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 10px 0;
+  }
+</style>
+
+<script>
+    // Initialize map centered on the USA
+    var map = L.map('map').setView([37.8, -96], 4);  // Lat: 37.8, Lon: -96, Zoom: 4 (nation level)
+
+    // Add OpenStreetMap tiles for zooming
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,  // Allows zooming to street level
+        minZoom: 2    // Allows zooming out to global level
+    }).addTo(map);
+
+    // Custom Tesla logo icon
+    var teslaIcon = L.icon({
+        iconUrl: '{% static "incidents/tesla-logo.png" %}',
+        iconSize: [32, 32],  // Adjust size as needed
+    });
+
+   // Add markers with Tesla logo
+   {% for incident in incidents %}
+        var marker = L.marker([{{ incident.latitude }}, {{ incident.longitude }}], {icon: teslaIcon}).addTo(map);
+        marker.bindPopup(`
+            <b>Time:</b> {{ incident.time }}<br>
+            <b>Location:</b> {{ incident.location }}<br>
+            <b>Status:</b> {{ incident.status }}<br>
+            {% if incident.image %}<img src="{{ incident.image.url }}" class="full-width"><br>{% endif %}
+            {% if incident.video %}<video class="full-width" controls><source src="{{ incident.video.url }}" type="video/mp4"></video><br>{% endif %}
+            <b>Description:</b> {{ incident.description }}
+        `, {
+            className: 'full-screen-popup',
+  closeOnClick: false,
+  autoClose: false,
+  closeButton: false
+        });
+    {% endfor %}
+</script>
+{% endblock %}
