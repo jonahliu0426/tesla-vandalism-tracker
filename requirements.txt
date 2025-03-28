@@ -2,3 +2,5 @@ Django
 gunicorn
 whitenoise
 Pillow>=10.0.0
+dj-database-url
+psycopg2-binary
